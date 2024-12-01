@@ -1,0 +1,26 @@
+{
+  "name": "cool-blog",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "server",
+    "admin",
+    "blog",
+    "shared"
+  ],
+  "scripts": {
+    "dev:server": "cd server && npm run dev",
+    "dev:admin": "cd admin && npm run dev",
+    "dev:blog": "cd blog && npm run dev",
+    "install:all": "npm install && npm run install:server && npm run install:admin",
+    "install:server": "cd server && npm install",
+    "install:admin": "cd admin && npm install",
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0"
+  }
+}
