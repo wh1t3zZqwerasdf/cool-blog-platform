@@ -117,8 +117,8 @@ import { useRouter } from 'vue-router'
 import { Document, View, Folder, PriceTag, Refresh } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
 import type { EChartsType } from 'echarts'
-import axios from '../utils/axios'
-import { formatDate } from '../utils/format'
+import axios from '@/utils/axios'
+import { formatDate } from '@/utils/format'
 
 const router = useRouter()
 

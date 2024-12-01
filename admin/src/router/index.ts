@@ -4,7 +4,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'Login',
-    component: () => import('../views/login/index.vue'),
+    component: () => import('@/views/login/index.vue'),
     meta: {
       title: '登录',
       requiresAuth: false
@@ -12,7 +12,7 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/',
-    component: () => import('../layouts/default.vue'),
+    component: () => import('@/layouts/default.vue'),
     meta: {
       requiresAuth: true
     },
@@ -20,7 +20,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: '',
         name: 'Dashboard',
-        component: () => import('../views/dashboard/index.vue'),
+        component: () => import('@/views/dashboard/index.vue'),
         meta: {
           title: '仪表盘',
           icon: 'dashboard'
@@ -29,7 +29,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'articles',
         name: 'Articles',
-        component: () => import('../views/articles/index.vue'),
+        component: () => import('@/views/articles/index.vue'),
         meta: {
           title: '文章管理',
           icon: 'document'
@@ -38,7 +38,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'articles/create',
         name: 'CreateArticle',
-        component: () => import('../views/articles/edit.vue'),
+        component: () => import('@/views/articles/edit.vue'),
         meta: {
           title: '创建文章',
           icon: 'edit'
@@ -47,7 +47,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'articles/edit/:id',
         name: 'EditArticle',
-        component: () => import('../views/articles/edit.vue'),
+        component: () => import('@/views/articles/edit.vue'),
         meta: {
           title: '编辑文章',
           icon: 'edit'
@@ -56,7 +56,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'categories',
         name: 'Categories',
-        component: () => import('../views/categories/index.vue'),
+        component: () => import('@/views/categories/index.vue'),
         meta: {
           title: '分类管理',
           icon: 'folder'
@@ -65,7 +65,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'tags',
         name: 'Tags',
-        component: () => import('../views/tags/index.vue'),
+        component: () => import('@/views/tags/index.vue'),
         meta: {
           title: '标签管理',
           icon: 'price-tag'
@@ -74,7 +74,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'profile',
         name: 'Profile',
-        component: () => import('../views/profile/index.vue'),
+        component: () => import('@/views/profile/index.vue'),
         meta: {
           title: '个人设置',
           icon: 'user'
@@ -85,7 +85,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
-    component: () => import('../views/error/404.vue'),
+    component: () => import('@/views/error/404.vue'),
     meta: {
       title: '404',
       requiresAuth: false
