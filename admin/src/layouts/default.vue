@@ -14,9 +14,9 @@
           :class="{ 'bg-primary bg-opacity-10 text-primary': isCurrentRoute(route.path) }"
         >
           <el-icon class="mr-2">
-            <component :is="route.meta.icon" />
+            <component :is="route?.meta?.icon" />
           </el-icon>
-          {{ route.meta.title }}
+          {{ route?.meta?.title }}
         </router-link>
       </nav>
     </aside>
