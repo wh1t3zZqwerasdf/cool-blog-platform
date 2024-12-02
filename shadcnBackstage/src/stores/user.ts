@@ -2,9 +2,10 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { authApi } from '@/api/auth'
 import type { UserInfo, LoginForm } from '@/types/auth'
+import { getToken, setToken, removeToken } from '@/utils/cache'
 
 const useUserStore = defineStore('user', () => {
-  const token = ref<string>(localStorage.getItem('token') || '')
+  const token = ref<string>(getToken() || '')
   const userInfo = ref<UserInfo | null>(null)
 
   /** 登录 */
@@ -12,7 +13,7 @@ const useUserStore = defineStore('user', () => {
     try {
       const { token: newToken, user } = await authApi.login(loginForm)
       token.value = newToken
-      localStorage.setItem('token', newToken)
+      setToken(newToken)
       userInfo.value = user
       return true
     } catch (error) {
@@ -45,22 +46,21 @@ const useUserStore = defineStore('user', () => {
   function resetToken() {
     token.value = ''
     userInfo.value = null
-    localStorage.removeItem('token')
+    removeToken()
   }
 
   return {
     token,
     userInfo,
     login,
-    logout,
     getUserInfo,
+    logout,
     resetToken
   }
 })
 
-export default useUserStore
-
-// 非setup
-export function useUserStoreHook() {
+export const useUserStoreHook = () => {
   return useUserStore()
 }
+
+export default useUserStore

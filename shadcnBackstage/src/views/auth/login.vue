@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useUserStore } from '@/stores/user'
+import { useUserStoreHook } from '@/stores/user'
 
 interface LoginForm {
   email: string
@@ -21,7 +21,7 @@ interface FormState {
 }
 
 const router = useRouter()
-const userStore = useUserStore()
+const userStore = useUserStoreHook()
 
 const formData = reactive<LoginForm>({
   email: '',
@@ -49,7 +49,7 @@ async function handleLogin() {
 
   formState.loading = true
   try {
-    const success = await userStore.login(formData.email, formData.password)
+    const success = await userStore.login(formData)
     if (success) {
       router.push('/dashboard')
     } else {
@@ -132,8 +132,8 @@ async function handleLogin() {
           </div>
         </div>
       </div>
-      <div class="hidden bg-muted lg:block">
-        <img alt="Image" width="1920" height="1080"
+      <div class="hidden lg:block bg-muted h-screen">
+        <img src="@/assets/images/prompthero.webp" alt="Image"
           class="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale">
       </div>
     </div>
