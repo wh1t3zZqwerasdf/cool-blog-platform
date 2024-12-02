@@ -133,7 +133,7 @@ body {
 
 @media (min-width: 640px) {
   .layout-content {
-    @apply p-6;
+    @apply p-4;
   }
 
   .card {

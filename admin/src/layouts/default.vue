@@ -148,7 +148,7 @@ const handleLogout = () => {
     cancelButtonText: '取消',
     type: 'warning'
   }).then(() => {
-    userStore.logout()
+    userStore.handleLogout()
     router.push('/login')
   })
 }

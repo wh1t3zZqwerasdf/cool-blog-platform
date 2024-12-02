@@ -14,9 +14,9 @@
         @submit.prevent="handleSubmit"
       >
         <div class="mb-4">
-          <el-radio-group v-model="loginType" class="w-full flex justify-center">
-            <el-radio-button label="username">用户名登录</el-radio-button>
-            <el-radio-button label="email">邮箱登录</el-radio-button>
+          <el-radio-group v-model="loginType" class="w-full flex justify-center" >
+            <el-radio-button :value="'username'">用户名登录</el-radio-button>
+            <el-radio-button :value="'email'">邮箱登录</el-radio-button>
           </el-radio-group>
         </div>
 
@@ -51,7 +51,7 @@
 
         <div class="flex items-center justify-between">
           <el-checkbox v-model="rememberMe">记住我</el-checkbox>
-          <el-button type="text" class="text-primary hover:text-primary-dark">
+          <el-button link class="text-primary hover:text-primary-dark">
             忘记密码？
           </el-button>
         </div>
@@ -76,6 +76,7 @@ import { ElMessage } from 'element-plus'
 import { Message, Lock, User } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 import type { FormInstance, FormRules } from 'element-plus'
+import type { LoginData } from '@/api/user'
 
 const router = useRouter()
 const route = useRoute()
@@ -94,15 +95,15 @@ const formData = reactive({
 
 const rules = computed<FormRules>(() => ({
   username: [
-    { required: loginType.value === 'username', message: '请输入用户名', trigger: 'blur' },
+    { required: loginType.value === 'username', message: '请输入用户名', trigger: 'change' },
     { min: 3, message: '用户名长度不能小于3位', trigger: 'blur' }
   ],
   email: [
-    { required: loginType.value === 'email', message: '请输入邮箱地址', trigger: 'blur' },
+    { required: loginType.value === 'email', message: '请输入邮箱地址', trigger: 'change' },
     { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
   ],
   password: [
-    { required: true, message: '请输入密码', trigger: 'blur' },
+    { required: true, message: '请输入密码', trigger: 'change' },
     { min: 6, message: '密码长度不能小于6位', trigger: 'blur' }
   ]
 }))
@@ -114,7 +115,7 @@ const handleSubmit = async () => {
     if (valid) {
       loading.value = true
       try {
-        const loginData = {
+        const loginData: LoginData = {
           password: formData.password
         }
         if (loginType.value === 'username') {
@@ -123,7 +124,7 @@ const handleSubmit = async () => {
           loginData.email = formData.email
         }
 
-        const success = await userStore.login(loginData)
+        const success = await userStore.handleLogin(loginData)
         if (success) {
           ElMessage.success('登录成功')
           // 如果有重定向地址，则跳转到重定向地址

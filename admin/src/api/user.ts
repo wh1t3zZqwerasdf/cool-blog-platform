@@ -1,12 +1,12 @@
 import request from '@/utils/request'
 
-interface LoginData {
+export interface LoginData {
   username?: string
   email?: string
   password: string
 }
 
-interface LoginResponse {
+export interface LoginResponse {
   token: string
   userInfo: {
     id: string
@@ -29,7 +29,7 @@ export function getLoginCode() {
     captchaId: string
     captchaImg: string
   }>({
-    url: '/api/auth/login/code',
+    url: '/api/auth/captcha',
     method: 'get'
   })
 }
