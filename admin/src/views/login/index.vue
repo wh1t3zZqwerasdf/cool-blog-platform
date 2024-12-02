@@ -13,12 +13,27 @@
         class="mt-8 space-y-6"
         @submit.prevent="handleSubmit"
       >
-        <el-form-item prop="email">
+        <div class="mb-4">
+          <el-radio-group v-model="loginType" class="w-full flex justify-center">
+            <el-radio-button label="username">用户名登录</el-radio-button>
+            <el-radio-button label="email">邮箱登录</el-radio-button>
+          </el-radio-group>
+        </div>
+
+        <el-form-item :prop="loginType">
           <el-input
+            v-if="loginType === 'email'"
             v-model="formData.email"
             type="email"
             placeholder="邮箱地址"
             :prefix-icon="Message"
+            class="rounded-md"
+          />
+          <el-input
+            v-else
+            v-model="formData.username"
+            placeholder="用户名"
+            :prefix-icon="User"
             class="rounded-md"
           />
         </el-form-item>
@@ -55,10 +70,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Message, Lock } from '@element-plus/icons-vue'
+import { Message, Lock, User } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 import type { FormInstance, FormRules } from 'element-plus'
 
@@ -69,22 +84,28 @@ const userStore = useUserStore()
 const formRef = ref<FormInstance>()
 const loading = ref(false)
 const rememberMe = ref(false)
+const loginType = ref<'username' | 'email'>('username')
 
 const formData = reactive({
+  username: '',
   email: '',
   password: ''
 })
 
-const rules: FormRules = {
+const rules = computed<FormRules>(() => ({
+  username: [
+    { required: loginType.value === 'username', message: '请输入用户名', trigger: 'blur' },
+    { min: 3, message: '用户名长度不能小于3位', trigger: 'blur' }
+  ],
   email: [
-    { required: true, message: '请输入邮箱地址', trigger: 'blur' },
+    { required: loginType.value === 'email', message: '请输入邮箱地址', trigger: 'blur' },
     { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
   ],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
     { min: 6, message: '密码长度不能小于6位', trigger: 'blur' }
   ]
-}
+}))
 
 const handleSubmit = async () => {
   if (!formRef.value) return
@@ -93,7 +114,16 @@ const handleSubmit = async () => {
     if (valid) {
       loading.value = true
       try {
-        const success = await userStore.login(formData)
+        const loginData = {
+          password: formData.password
+        }
+        if (loginType.value === 'username') {
+          loginData.username = formData.username
+        } else {
+          loginData.email = formData.email
+        }
+
+        const success = await userStore.login(loginData)
         if (success) {
           ElMessage.success('登录成功')
           // 如果有重定向地址，则跳转到重定向地址
@@ -102,7 +132,7 @@ const handleSubmit = async () => {
         }
       } catch (error) {
         console.error('Login error:', error)
-        ElMessage.error('登录失败，请检查邮箱和密码')
+        ElMessage.error('登录失败，请检查用户名/邮箱和密码')
       } finally {
         loading.value = false
       }

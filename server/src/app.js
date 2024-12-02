@@ -6,7 +6,7 @@ const swaggerSpec = require('./config/swagger');
 require('dotenv').config();
 
 const articleRoutes = require('./routes/articleRoutes');
-const authRoutes = require('./routes/authRoutes');
+const authRoutes = require('./routes/auth');
 
 const app = express();
 
@@ -18,10 +18,7 @@ app.use(express.json());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // 数据库连接
-mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
+mongoose.connect(process.env.MONGODB_URI)
 .then(() => console.log('MongoDB connected'))
 .catch(err => console.error('MongoDB connection error:', err));
 
@@ -44,7 +41,7 @@ app.use((err, req, res, next) => {
 });
 
 // 启动服务器
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
     console.log(`API Documentation available at http://localhost:${PORT}/api-docs`);

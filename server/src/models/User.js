@@ -47,7 +47,12 @@ userSchema.pre('save', async function(next) {
 
 // 验证密码的方法
 userSchema.methods.comparePassword = async function(candidatePassword) {
-    return bcrypt.compare(candidatePassword, this.password);
+    try {
+        return await bcrypt.compare(candidatePassword, this.password);
+    } catch (error) {
+        console.error('Password comparison error:', error);
+        return false;
+    }
 };
 
 module.exports = mongoose.model('User', userSchema);

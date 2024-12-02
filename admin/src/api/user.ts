@@ -1,7 +1,8 @@
 import request from '@/utils/request'
 
 interface LoginData {
-  username: string
+  username?: string
+  email?: string
   password: string
 }
 
@@ -10,6 +11,7 @@ interface LoginResponse {
   userInfo: {
     id: string
     username: string
+    email: string
     role: string
   }
 }

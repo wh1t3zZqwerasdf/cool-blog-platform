@@ -1,12 +1,13 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { login, logout } from '@/api/user'
+import type { LoginData } from '@/api/user'
 
 export const useUserStore = defineStore('user', () => {
   const token = ref(localStorage.getItem('token') || '')
   const userInfo = ref<any>(null)
 
-  async function handleLogin(loginData: { username: string; password: string }) {
+  async function handleLogin(loginData: LoginData) {
     try {
       const res = await login(loginData)
       token.value = res.token
