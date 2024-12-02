@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const User = require('../models/user');
 
 // 验证 JWT token
 exports.authenticateToken = async (req, res, next) => {
@@ -15,6 +15,9 @@ exports.authenticateToken = async (req, res, next) => {
         req.user = decoded;
         next();
     } catch (error) {
+        if (error.name === 'TokenExpiredError') {
+            return res.status(401).json({ message: '令牌已过期，请重新登录' });
+        }
         return res.status(403).json({ message: '无效的认证令牌' });
     }
 };
