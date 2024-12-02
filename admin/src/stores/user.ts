@@ -1,74 +1,40 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import axios from '@/utils/axios'
+import { login, logout } from '@/api/user'
 
 export const useUserStore = defineStore('user', () => {
   const token = ref(localStorage.getItem('token') || '')
-  const username = ref(localStorage.getItem('username') || '')
-  const role = ref(localStorage.getItem('role') || '')
+  const userInfo = ref<any>(null)
 
-  // 登录
-  const login = async (loginData: { email: string; password: string }) => {
+  async function handleLogin(loginData: { username: string; password: string }) {
     try {
-      const response = await axios.post('/api/auth/login', loginData)
-      const { token: newToken, user } = response.data
-
-      // 保存到 store
-      token.value = newToken
-      username.value = user.username
-      role.value = user.role
-
-      // 保存到 localStorage
-      localStorage.setItem('token', newToken)
-      localStorage.setItem('username', user.username)
-      localStorage.setItem('role', user.role)
-
-      // 设置 axios 默认 header
-      axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`
-
-      return true
+      const res = await login(loginData)
+      token.value = res.token
+      userInfo.value = res.userInfo
+      localStorage.setItem('token', res.token)
+      return res
     } catch (error) {
-      console.error('Login failed:', error)
-      return false
+      token.value = ''
+      userInfo.value = null
+      localStorage.removeItem('token')
+      throw error
     }
   }
 
-  // 登出
-  const logout = () => {
-    // 清除 store
-    token.value = ''
-    username.value = ''
-    role.value = ''
-
-    // 清除 localStorage
-    localStorage.removeItem('token')
-    localStorage.removeItem('username')
-    localStorage.removeItem('role')
-
-    // 清除 axios header
-    delete axios.defaults.headers.common['Authorization']
-  }
-
-  // 获取用户信息
-  const getUserInfo = async () => {
+  async function handleLogout() {
     try {
-      const response = await axios.get('/api/auth/profile')
-      const user = response.data
-      username.value = user.username
-      role.value = user.role
-      return user
-    } catch (error) {
-      console.error('Get user info failed:', error)
-      return null
+      await logout()
+    } finally {
+      token.value = ''
+      userInfo.value = null
+      localStorage.removeItem('token')
     }
   }
 
   return {
     token,
-    username,
-    role,
-    login,
-    logout,
-    getUserInfo
+    userInfo,
+    login: handleLogin,
+    logout: handleLogout
   }
 })
