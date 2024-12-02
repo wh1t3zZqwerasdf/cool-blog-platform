@@ -1,13 +1,13 @@
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
-import {  useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
 // 创建axios实例
 const instance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
-  timeout: 15000,
+  baseURL: '',  // 使用相对路径，让代理处理
+  timeout: 30000,  // 增加超时时间到 30 秒
   headers: {
     'Content-Type': 'application/json'
   }
@@ -31,6 +31,7 @@ instance.interceptors.request.use(
 // 响应拦截器
 instance.interceptors.response.use(
   (response) => {
+    // 直接返回响应数据
     return response.data
   },
   (error) => {
@@ -51,15 +52,17 @@ instance.interceptors.response.use(
           ElMessage.error('请求的资源不存在')
           break
         case 500:
-          ElMessage.error('服务器错误')
+          ElMessage.error('服务器内部错误')
           break
         default:
-          ElMessage.error(error.response.data.message || '请求失败')
+          ElMessage.error(error.response.data?.message || '请求失败')
       }
+    } else if (error.request) {
+      ElMessage.error('网络连接失败，请检查网络设置')
     } else {
-      ElMessage.error('网络错误，请检查您的网络连接')
+      ElMessage.error('请求配置错误')
     }
-
+    
     return Promise.reject(error)
   }
 )
