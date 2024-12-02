@@ -54,7 +54,7 @@
           </div>
         </template>
         <div class="h-80">
-          <div ref="articleTrendChart" class="w-full h-full"></div>
+          <div ref="articleTrendChartRef" class="w-full h-full"></div>
         </div>
       </el-card>
 
@@ -69,7 +69,7 @@
           </div>
         </template>
         <div class="h-80">
-          <div ref="categoryPieChart" class="w-full h-full"></div>
+          <div ref="categoryPieChartRef" class="w-full h-full"></div>
         </div>
       </el-card>
     </div>
@@ -114,15 +114,20 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { Document, View, Folder, PriceTag, Refresh } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
-import type { EChartsType } from 'echarts'
+import { Document, View, Folder, PriceTag, Refresh } from '@element-plus/icons-vue'
+import { formatDate } from '@/utils/date'
 import axios from '@/utils/axios'
-import { formatDate } from '@/utils/format'
 
 const router = useRouter()
 
-// 统计数据
+// 图表实例
+const articleTrendChartRef = ref<HTMLElement>()
+const categoryPieChartRef = ref<HTMLElement>()
+let articleTrendChart: echarts.ECharts | null = null
+let categoryPieChart: echarts.ECharts | null = null
+
+// 数据
 const statistics = ref({
   totalArticles: 0,
   totalViews: 0,
@@ -130,14 +135,7 @@ const statistics = ref({
   totalTags: 0
 })
 
-// 最新文章
 const latestArticles = ref([])
-
-// 图表实例
-let articleTrendChart: EChartsType | null = null
-let categoryPieChart: EChartsType | null = null
-const articleTrendChartRef = ref<HTMLElement>()
-const categoryPieChartRef = ref<HTMLElement>()
 
 // 初始化图表
 const initCharts = () => {
@@ -149,10 +147,18 @@ const initCharts = () => {
   }
 }
 
-// 更新图表尺寸
+// 处理窗口大小变化
 const handleResize = () => {
   articleTrendChart?.resize()
   categoryPieChart?.resize()
+}
+
+// 销毁图表
+const destroyCharts = () => {
+  articleTrendChart?.dispose()
+  categoryPieChart?.dispose()
+  articleTrendChart = null
+  categoryPieChart = null
 }
 
 // 获取统计数据
@@ -268,8 +274,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  destroyCharts()
   window.removeEventListener('resize', handleResize)
-  articleTrendChart?.dispose()
-  categoryPieChart?.dispose()
 })
 </script>
