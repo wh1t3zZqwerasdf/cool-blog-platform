@@ -77,6 +77,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStoreHook } from '@/stores/user'
 import { useMessage } from '@/hooks/useMessage'
+import ChartCard from './components/ChartCard.vue'
 
 // 这是示例数据
 const data = {
@@ -441,8 +442,8 @@ function setActiveTeam(team: typeof data.teams[number]) {
       <SidebarRail />
     </Sidebar>
     <SidebarInset>
-      <header class="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-        <div class="flex items-center gap-2 px-4">
+      <header class="flex flex-col gap-4 p-4">
+        <div class="flex items-center gap-4">
           <SidebarTrigger class="-ml-1" />
           <Separator orientation="vertical" class="mr-2 h-4" />
           <Breadcrumb>
@@ -461,12 +462,26 @@ function setActiveTeam(team: typeof data.teams[number]) {
         </div>
       </header>
       <div class="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <div class="grid auto-rows-min gap-4 md:grid-cols-3">
+        <div class="flex-1 bg-muted/50 rounded-xl">
+          
+        </div>
+        <!-- 上半部分：卡片网格 -->
+        <div class="grid auto-rows-min gap-4 md:grid-cols-4">
+          <div class="aspect-video rounded-xl bg-muted/50" />
           <div class="aspect-video rounded-xl bg-muted/50" />
           <div class="aspect-video rounded-xl bg-muted/50" />
           <div class="aspect-video rounded-xl bg-muted/50" />
         </div>
-        <div class="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
+        <!-- 下半部分：分成左右两栏 -->
+        <div class="flex h-[500px] gap-4 md:min-h-min">
+          <div class="flex-1 bg-muted/50 rounded-xl">
+            <ChartCard  class="h-full p-2"/>
+          </div>
+          <div class="flex-1 bg-muted/50 rounded-xl">
+            <!-- Right side is empty -->
+          </div>
+        </div>
+    
       </div>
     </SidebarInset>
   </SidebarProvider>
