@@ -28,9 +28,8 @@ service.interceptors.request.use(
 // 响应拦截器
 service.interceptors.response.use(
   (response) => {
-    const { code, msg, data } = response.data
-
-    if (code === 0) {
+    const { code, message, data } = response.data
+    if (code === 200) {
       return data
     }
 
@@ -41,8 +40,8 @@ service.interceptors.response.use(
       message.error('登录已过期，请重新登录')
     }
 
-    message.error(msg || '请求失败')
-    return Promise.reject(new Error(msg || 'Error'))
+    message.error(message || '请求失败')
+    return Promise.reject(new Error(message || 'Error'))
   },
   (error) => {
     message.error(error.response?.data?.msg || '网络错误')

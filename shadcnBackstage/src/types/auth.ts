@@ -7,11 +7,17 @@ export interface UserInfo {
   id: string
   username: string
   email: string
-  avatar?: string
-  roles: string[]
+  role: string
 }
 
 export interface LoginResponse {
   token: string
-  user: UserInfo
+  userInfo: UserInfo
+}
+
+export interface ApiResponse<T> {
+  code: number
+  success: boolean
+  message: string
+  data: T
 }

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { authApi } from '@/api/auth'
-import type { UserInfo, LoginForm } from '@/types/auth'
+import type { UserInfo, LoginForm, LoginResponse } from '@/types/auth'
 import { getToken, setToken, removeToken } from '@/utils/cache'
 
 const useUserStore = defineStore('user', () => {
@@ -11,12 +11,19 @@ const useUserStore = defineStore('user', () => {
   /** 登录 */
   async function login(loginForm: LoginForm) {
     try {
-      const { token: newToken, user } = await authApi.login(loginForm)
-      token.value = newToken
-      setToken(newToken)
-      userInfo.value = user
-      return true
+      const response = await authApi.login(loginForm)
+      console.log('Login response:', response)
+      
+      if (response.token) {
+        token.value = response.token
+        setToken(response.token)
+        userInfo.value = response.userInfo
+        return true
+      }
+      
+      return false
     } catch (error) {
+      console.error('Login error:', error)
       return false
     }
   }
@@ -25,9 +32,12 @@ const useUserStore = defineStore('user', () => {
   async function getUserInfo() {
     if (!token.value) return null
     try {
-      const data = await authApi.getUserInfo()
-      userInfo.value = data
-      return data
+      const response = await authApi.getUserInfo()
+      if (response.success && response.data) {
+        userInfo.value = response.data
+        return response.data
+      }
+      return null
     } catch {
       return null
     }
@@ -36,9 +46,15 @@ const useUserStore = defineStore('user', () => {
   /** 登出 */
   async function logout() {
     try {
-      await authApi.logout()
-    } finally {
-      resetToken()
+      const response = await authApi.logout()
+      if (response.success) {
+        resetToken()
+        return true
+      }
+      return false
+    } catch (error) {
+      console.error('Logout error:', error)
+      return false
     }
   }
 

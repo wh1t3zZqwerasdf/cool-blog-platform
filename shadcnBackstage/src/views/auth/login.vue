@@ -24,8 +24,8 @@ const router = useRouter()
 const userStore = useUserStoreHook()
 
 const formData = reactive<LoginForm>({
-  email: '',
-  password: ''
+  email: 'cocounts0001@outlook.com',
+  password: 'admin123'
 })
 
 const formState = reactive<FormState>({
