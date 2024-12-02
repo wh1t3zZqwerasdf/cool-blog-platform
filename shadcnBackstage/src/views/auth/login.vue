@@ -5,11 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useUserStoreHook } from '@/stores/user'
-
-interface LoginForm {
-  email: string
-  password: string
-}
+import type { LoginForm } from '@/types/auth'
+import { useMessage } from '@/hooks/useMessage'
 
 interface FormState {
   loading: boolean
@@ -22,6 +19,7 @@ interface FormState {
 
 const router = useRouter()
 const userStore = useUserStoreHook()
+const message = useMessage()
 
 const formData = reactive<LoginForm>({
   email: 'cocounts0001@outlook.com',
@@ -51,13 +49,16 @@ async function handleLogin() {
   try {
     const success = await userStore.login(formData)
     if (success) {
+      message.success('登录成功')
       router.push('/dashboard')
     } else {
       formState.errors.general = '登录失败，请检查邮箱和密码'
+      message.error('登录失败，请检查您的邮箱和密码是否正确')
     }
   } catch (error) {
     formState.errors.general = '登录过程中发生错误'
     console.error('登录错误:', error)
+    message.error('登录过程中发生错误，请重试')
   } finally {
     formState.loading = false
   }

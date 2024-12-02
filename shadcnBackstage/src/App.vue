@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { Toaster } from '@/components/ui/toast'
 </script>
 
 <template>
     <div class="min-h-screen bg-background font-sans antialiased">
         <router-view></router-view>
+        <Toaster />
     </div>
 </template>
 

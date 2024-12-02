@@ -1,31 +1,43 @@
-import { useToast } from '@/components/ui/toast/use-toast'
+import { toast } from '@/components/ui/toast/use-toast'
 
-export const useMessage = () => {
-  const { toast } = useToast()
+export function useMessage() {
+  const defaultConfig = {
+    duration: 3000
+  }
 
   return {
-    success(content: string) {
-      toast({
+    success(message: string) {
+      return toast({
         title: '成功',
-        description: content,
-        variant: 'default'
+        description: message,
+        variant: 'default',
+        ...defaultConfig
       })
     },
-
-    error(content: string) {
-      toast({
+    error(message: string) {
+      return toast({
         title: '错误',
-        description: content,
-        variant: 'destructive'
+        description: message,
+        variant: 'destructive',
+        ...defaultConfig
       })
     },
-
-    warning(content: string) {
-      toast({
+    warning(message: string) {
+      return toast({
         title: '警告',
-        description: content,
-        variant: 'default'
+        description: message,
+        variant: 'destructive',
+        ...defaultConfig
+      })
+    },
+    info(message: string) {
+      return toast({
+        title: '提示',
+        description: message,
+        ...defaultConfig
       })
     }
   }
 }
+
+export default useMessage

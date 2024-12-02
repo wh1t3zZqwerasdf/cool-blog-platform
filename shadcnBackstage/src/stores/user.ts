@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { authApi } from '@/api/auth'
-import type { UserInfo, LoginForm, LoginResponse } from '@/types/auth'
+import type { UserInfo, LoginForm } from '@/types/auth'
 import { getToken, setToken, removeToken } from '@/utils/cache'
 
 const useUserStore = defineStore('user', () => {
@@ -33,9 +33,9 @@ const useUserStore = defineStore('user', () => {
     if (!token.value) return null
     try {
       const response = await authApi.getUserInfo()
-      if (response.success && response.data) {
-        userInfo.value = response.data
-        return response.data
+      if (response) {
+        userInfo.value = response
+        return response
       }
       return null
     } catch {
@@ -47,7 +47,7 @@ const useUserStore = defineStore('user', () => {
   async function logout() {
     try {
       const response = await authApi.logout()
-      if (response.success) {
+      if (response) {
         resetToken()
         return true
       }
