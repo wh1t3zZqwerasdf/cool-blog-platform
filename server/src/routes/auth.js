@@ -24,44 +24,28 @@ const { authenticateToken } = require('../middleware/auth')
  *             properties:
  *               username:
  *                 type: string
- *                 description: 用户名
+ *                 example: admin
  *               email:
  *                 type: string
  *                 format: email
- *                 description: 邮箱地址
+ *                 example: admin@example.com
  *               password:
  *                 type: string
  *                 format: password
- *                 description: 密码
+ *                 example: password123
  *     responses:
- *       201:
+ *       200:
  *         description: 注册成功
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: 注册成功
- *                 token:
- *                   type: string
- *                   description: JWT token
- *                 userInfo:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                     username:
- *                       type: string
- *                     email:
- *                       type: string
- *                     role:
- *                       type: string
+ *               $ref: '#/components/schemas/LoginResponse'
  *       400:
- *         description: 用户名或邮箱已存在
- *       500:
- *         description: 服务器错误
+ *         description: 注册失败
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 router.post('/register', authController.register)
 
@@ -72,51 +56,38 @@ router.post('/register', authController.register)
  *     tags:
  *       - 认证
  *     summary: 用户登录
- *     description: 使用用户名/邮箱和密码登录
+ *     description: 使用邮箱和密码登录
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - email
+ *               - password
  *             properties:
- *               username:
- *                 type: string
- *                 description: 用户名（用户名和邮箱二选一）
  *               email:
  *                 type: string
  *                 format: email
- *                 description: 邮箱地址（用户名和邮箱二选一）
+ *                 example: admin@example.com
  *               password:
  *                 type: string
  *                 format: password
- *                 description: 密码
+ *                 example: password123
  *     responses:
  *       200:
  *         description: 登录成功
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 token:
- *                   type: string
- *                   description: JWT token
- *                 userInfo:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                     username:
- *                       type: string
- *                     email:
- *                       type: string
- *                     role:
- *                       type: string
- *       401:
- *         description: 用户名/邮箱或密码错误
- *       500:
- *         description: 服务器错误
+ *               $ref: '#/components/schemas/LoginResponse'
+ *       400:
+ *         description: 登录失败
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 router.post('/login', authController.login)
 
@@ -133,11 +104,48 @@ router.post('/login', authController.login)
  *     responses:
  *       200:
  *         description: 登出成功
- *       401:
- *         description: 未授权
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Success'
  *       500:
  *         description: 服务器错误
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 router.post('/logout', authenticateToken, authController.logout)
+
+/**
+ * @swagger
+ * /api/auth/user:
+ *   get:
+ *     tags:
+ *       - 认证
+ *     summary: 获取用户信息
+ *     description: 获取当前登录用户的信息
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: 成功获取用户信息
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/Success'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       $ref: '#/components/schemas/UserInfo'
+ *       401:
+ *         description: 未授权
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.get('/user', authenticateToken, authController.getUserInfo)
 
 module.exports = router
