@@ -55,6 +55,15 @@ const legendItems = ref<BulletLegendItemInterface[]>(props.categories.map((categ
 
 const isMounted = useMounted()
 
+const tickValues = computed(() => {
+  const maxIndex = props.data.length - 1;
+  let values = [];
+  for (let i = 0; i <= maxIndex; i += 1) {
+    values.push(i);
+  }
+  return values;
+});
+
 function handleLegendItemClick(d: BulletLegendItemInterface, i: number) {
   emits('legendItemClick', d, i)
 }
@@ -78,7 +87,6 @@ function handleLegendItemClick(d: BulletLegendItemInterface, i: number) {
           </linearGradient>
         </defs>
       </svg>
-
       <ChartCrosshair v-if="showTooltip" :colors="colors" :items="legendItems" :index="index" :custom-tooltip="customTooltip" />
 
       <template v-for="(category, i) in categories" :key="category">
@@ -113,6 +121,7 @@ function handleLegendItemClick(d: BulletLegendItemInterface, i: number) {
       <VisAxis
         v-if="showXAxis"
         type="x"
+        :tick-values="tickValues"
         :tick-format="xFormatter ?? ((v: number) => data[v]?.[index])"
         :grid-line="false"
         :tick-line="false"
