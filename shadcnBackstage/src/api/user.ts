@@ -17,10 +17,11 @@ export interface UserListResponse {
 
 export const userApi = {
   // 获取用户列表
-  getUsers() {
+  getUsers(params: { page: number; pageSize: number }) {
     return request<ApiResponse<UserListResponse>>({
       url: '/api/users',
-      method: 'get'
+      method: 'get',
+      params
     })
   },
 

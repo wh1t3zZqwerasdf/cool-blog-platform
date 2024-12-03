@@ -424,37 +424,39 @@ function setActiveTeam(team: typeof data.teams[number]) {
       <SidebarRail />
     </Sidebar>
     <SidebarInset>
-      <header class="flex flex-col gap-4 p-4">
-        <div class="flex items-center gap-4">
-          <SidebarTrigger class="-ml-1" />
-          <Separator orientation="vertical" class="mr-2 h-4" />
-          <Breadcrumb>
-            <BreadcrumbList>
-              <template v-for="(item, index) in breadcrumbs" :key="item.path">
-                <BreadcrumbItem class="hidden md:block">
-                  <template v-if="index === breadcrumbs.length - 1">
-                    <BreadcrumbPage>{{ item.name }}</BreadcrumbPage>
-                  </template>
-                  <template v-else>
-                    <BreadcrumbLink as-child>
-                      <RouterLink :to="item.path" class="hover:text-primary">
-                        {{ item.name }}
-                      </RouterLink>
-                    </BreadcrumbLink>
-                  </template>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator 
-                  v-if="index < breadcrumbs.length - 1" 
-                  class="hidden md:block" 
-                />
-              </template>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
-      </header>
-      <main class="flex-1">
-        <RouterView />
-      </main>
+      <div class="flex h-screen flex-col">
+        <header class="h-[60px] flex flex-col gap-4 p-4">
+          <div class="flex items-center gap-4">
+            <SidebarTrigger class="-ml-1" />
+            <Separator orientation="vertical" class="mr-2 h-4" />
+            <Breadcrumb>
+              <BreadcrumbList>
+                <template v-for="(item, index) in breadcrumbs" :key="item.path">
+                  <BreadcrumbItem class="hidden md:block">
+                    <template v-if="index === breadcrumbs.length - 1">
+                      <BreadcrumbPage>{{ item.name }}</BreadcrumbPage>
+                    </template>
+                    <template v-else>
+                      <BreadcrumbLink as-child>
+                        <RouterLink :to="item.path" class="hover:text-primary">
+                          {{ item.name }}
+                        </RouterLink>
+                      </BreadcrumbLink>
+                    </template>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator 
+                    v-if="index < breadcrumbs.length - 1" 
+                    class="hidden md:block" 
+                  />
+                </template>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
+        </header>
+        <main class="flex-1 overflow-y-auto">
+          <RouterView />
+        </main>
+      </div>
     </SidebarInset>
   </SidebarProvider>
 </template>
