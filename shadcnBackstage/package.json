@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@tanstack/vue-table": "^8.20.5",
+    "@types/lodash-es": "^4.17.12",
     "@unovis/ts": "^1.4.5",
     "@unovis/vue": "^1.4.5",
     "@vee-validate/zod": "^4.14.7",
@@ -17,6 +18,7 @@
     "axios": "^1.7.8",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "lodash-es": "^4.17.21",
     "lucide-vue-next": "^0.462.0",
     "pinia": "^2.2.8",
     "radix-vue": "^1.9.10",

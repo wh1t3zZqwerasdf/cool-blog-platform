@@ -5,7 +5,15 @@
       <header
         class="sticky top-0 z-30 mb-2 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
         <div class="relative w-full max-w-sm items-center">
-          <Input id="search" type="text" placeholder="Search..." class="pl-10" />
+          <Input 
+            id="search" 
+            type="text" 
+            v-model="searchEmail"  
+            placeholder="Search Email..." 
+            class="pl-10" 
+            clearable
+            @update:modelValue="handleEmailSearch"
+          />
           <span class="absolute start-0 inset-y-0 flex items-center justify-center px-2">
             <Search class="size-6 text-muted-foreground" />
           </span>
@@ -206,20 +214,10 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import {
-  CircleUser,
-  File,
-  Home,
-  LineChart,
   ListFilter,
   MoreHorizontal,
-  Package,
-  Package2,
-  PanelLeft,
   PlusCircle,
   Search,
-  Settings,
-  ShoppingCart,
-  Users2,
 } from 'lucide-vue-next'
 
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from '@/components/ui/dialog'
@@ -239,6 +237,7 @@ import { userApi, type User } from '@/api/user'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
+import { debounce } from 'lodash-es'
 
 const message = useMessage()
 const usersData = ref<User[]>([])
@@ -264,6 +263,15 @@ const roleFilter = ref([
   }
 ])
 
+const searchEmail = ref('')
+
+// 处理邮箱搜索
+const handleEmailSearch = debounce((value: string | number) => {
+  searchEmail.value = String(value)
+  PageData.value.page = 1 // 重置页码
+  return fetchUsers()
+}, 500)
+
 const selectedRole = ref('')
 
 const handleRoleSelect = async (role:string) => {
@@ -273,6 +281,12 @@ const handleRoleSelect = async (role:string) => {
   // 重新获取用户列表
   console.log(role)
   await fetchUsers()
+}
+
+// 清除搜索
+const clearSearch = () => {
+  searchEmail.value = ''
+  handleEmailSearch('')
 }
 
 // 表单验证规则
@@ -320,7 +334,8 @@ const fetchUsers = async () => {
     const params = {
       page: PageData.value.page,
       pageSize: PageData.value.pageSize,
-      ...(selectedRole.value ? { role: selectedRole.value } : {})
+      ...(selectedRole.value ? { role: selectedRole.value } : {}),
+      ...(searchEmail.value ? { email: searchEmail.value } : {})
     }
     const { data, success } = await userApi.getUsers(params)
     if (success) {
@@ -329,6 +344,7 @@ const fetchUsers = async () => {
     }
   } catch (error) {
     console.error('获取用户列表失败:', error)
+    message.error('获取用户列表失败')
   }
 }
 

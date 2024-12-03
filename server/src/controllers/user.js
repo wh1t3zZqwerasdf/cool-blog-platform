@@ -10,7 +10,7 @@ async function getUserList(req, res) {
   try {
     console.log('获取用户列表 - 请求参数:', req.body);
     // 获取分页参数和角色参数
-    const { page = 1, pageSize = 10, role } = req.body;
+    const { page = 1, pageSize = 10, role, email } = req.body;
     
     // 计算跳过的文档数
     const skip = (Number(page) - 1) * Number(pageSize);
@@ -21,6 +21,10 @@ async function getUserList(req, res) {
     if (role) {
       // 如果提供了角色，添加到查询条件中（不区分大小写）
       query.role = role.toLowerCase();
+    }
+    if (email) {
+      // 如果提供了邮箱搜索，添加模糊查询（不区分大小写）
+      query.email = { $regex: email, $options: 'i' };
     }
     console.log('查询条件:', query);
     
