@@ -11,24 +11,24 @@ exports.register = async (req, res) => {
         // 检查用户名是否已存在
         const existingUsername = await User.findOne({ username });
         if (existingUsername) {
-            return res.json(Response.error('用户名已存在'));
+            return res.status(400).json(Response.error('用户名已存在'));
         }
 
         // 检查邮箱是否已存在
         const existingEmail = await User.findOne({ email: email.toLowerCase() });
         if (existingEmail) {
-            return res.json(Response.error('邮箱已被注册'));
+            return res.status(400).json(Response.error('邮箱已被注册'));
         }
 
         // 验证角色
-        const validRole = role === 'Admin' ? 'Admin' : 'Guest';
+        const validRole = role === 'admin' ? 'admin' : 'guest';
 
         // 创建新用户
         const user = new User({
             username,
-            email,
+            email: email.toLowerCase(),
             password,
-            role: validRole // 如果没有指定角色或角色无效，默认设置为Guest
+            role: validRole
         });
 
         await user.save();
@@ -40,7 +40,7 @@ exports.register = async (req, res) => {
             { expiresIn: '24h' }
         );
 
-        res.json(Response.success({
+        return Response.success(res, {
             token,
             userInfo: {
                 id: user._id,
@@ -48,10 +48,10 @@ exports.register = async (req, res) => {
                 email: user.email,
                 role: user.role
             }
-        }, '注册成功'));
+        }, '注册成功');
     } catch (error) {
         console.error('Registration error:', error);
-        res.json(Response.serverError());
+        return Response.serverError(res);
     }
 };
 
@@ -63,13 +63,13 @@ exports.login = async (req, res) => {
         // 查找用户
         const user = await User.findOne({ email: email.toLowerCase() });
         if (!user) {
-            return res.json(Response.error('用户不存在'));
+            return res.status(400).json(Response.error('用户不存在'));
         }
 
         // 验证密码
         const isValidPassword = await bcrypt.compare(password, user.password);
         if (!isValidPassword) {
-            return res.json(Response.error('密码错误'));
+            return res.status(400).json(Response.error('密码错误'));
         }
 
         // 生成token
@@ -79,7 +79,7 @@ exports.login = async (req, res) => {
             { expiresIn: '24h' }
         );
 
-        res.json(Response.success({
+        return Response.success(res, {
             token,
             userInfo: {
                 id: user._id,
@@ -87,10 +87,10 @@ exports.login = async (req, res) => {
                 email: user.email,
                 role: user.role
             }
-        }, '登录成功'));
+        }, '登录成功');
     } catch (error) {
         console.error('Login error:', error);
-        res.json(Response.serverError());
+        return Response.serverError(res);
     }
 };
 

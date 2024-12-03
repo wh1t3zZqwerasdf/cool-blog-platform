@@ -25,7 +25,10 @@ async function getUserList(req, res) {
     console.log('查询条件:', query);
     
     // 获取总数
-    const total = await User.countDocuments(query);
+    const total = await User.countDocuments(query).catch(error => {
+      console.error('获取用户总数失败:', error);
+      throw error;
+    });
     
     // 查询用户列表，排除密码字段
     const list = await User.find(query)
@@ -33,7 +36,10 @@ async function getUserList(req, res) {
       .skip(skip)
       .limit(Number(pageSize))
       .sort({ createdAt: -1 })  // 按创建时间倒序
-      .lean();  // 转换为普通 JavaScript 对象
+      .lean().catch(error => {
+        console.error('获取用户列表失败:', error);
+        throw error;
+      });  // 转换为普通 JavaScript 对象
     
     // 处理返回的数据
     const formattedList = list.map(user => ({

@@ -43,10 +43,8 @@
         </div>
       </header>
       <main class="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
-        <Tabs default-value="all">
-          <TabsContent value="all">
-            <Card>
-              <CardContent>
+            <Card class="h-full">
+              <CardContent class="h-[calc(100%-60px)]">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -127,8 +125,6 @@
                 </div>
               </CardFooter>
             </Card>
-          </TabsContent>
-        </Tabs>
       </main>
     </div>
   </div>

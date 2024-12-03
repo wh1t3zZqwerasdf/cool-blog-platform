@@ -23,13 +23,15 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['admin', 'editor'],
-        default: 'editor'
+        enum: ['admin', 'guest'],  // 修改为 admin 和 guest
+        default: 'guest'  // 默认角色为 guest
     },
     createdAt: {
         type: Date,
         default: Date.now
     }
+}, {
+    timestamps: true
 });
 
 // 密码加密中间件
