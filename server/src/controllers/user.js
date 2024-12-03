@@ -29,16 +29,10 @@ async function getUserList(req, res) {
     console.log('用户总数:', total);
     
     // 返回结果
-    const response = Response.success({
+    res.json(Response.success({
       list,
-      pagination: {
-        total,
-        page: Number(page),
-        pageSize: Number(pageSize)
-      }
-    });
-    console.log('响应数据:', response);
-    res.json(response);
+      total
+    }));
   } catch (error) {
     console.error('获取用户列表失败:', error);
     res.status(500).json(Response.error('获取用户列表失败', 500));

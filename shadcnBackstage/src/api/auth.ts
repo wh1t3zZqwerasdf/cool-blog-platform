@@ -1,9 +1,9 @@
 import request from '@/utils/request'
-import type { LoginForm, LoginResponse, UserInfo, UserInfoResponse } from '@/types/auth'
+import type { LoginForm, LoginResponse, UserInfo, ApiResponse } from '@/types/auth'
 
 export const authApi = {
   login(data: LoginForm) {
-    return request<LoginResponse>({
+    return request<ApiResponse<LoginResponse>>({
       url: '/api/auth/login',
       method: 'post',
       data
@@ -11,14 +11,14 @@ export const authApi = {
   },
 
   getUserInfo() {
-    return request<UserInfoResponse>({
+    return request<ApiResponse<UserInfo>>({
       url: '/api/auth/user',
       method: 'get'
     })
   },
 
   logout() {
-    return request<UserInfoResponse>({
+    return request<ApiResponse<null>>({
       url: '/api/auth/logout',
       method: 'post'
     })

@@ -11,16 +11,17 @@ const useUserStore = defineStore('user', () => {
   /** 登录 */
   async function login(loginForm: LoginForm) {
     try {
-      const response = await authApi.login(loginForm)
-      console.log('Login response:', response)
+      const { data, success, message } = await authApi.login(loginForm)
+      console.log('Login response:', data)
       
-      if (response.token) {
-        token.value = response.token
-        setToken(response.token)
-        userInfo.value = response.userInfo
+      if (success && data.token) {
+        // 保存 token
+        token.value = data.token
+        setToken(data.token)
+        // 保存用户信息
+        userInfo.value = data.userInfo
         return true
       }
-      
       return false
     } catch (error) {
       console.error('Login error:', error)
@@ -34,7 +35,7 @@ const useUserStore = defineStore('user', () => {
     try {
       const response = await authApi.getUserInfo()
       if (response) {
-        userInfo.value = response
+        userInfo.value = response.data
         return response
       }
       return null
@@ -46,12 +47,9 @@ const useUserStore = defineStore('user', () => {
   /** 登出 */
   async function logout() {
     try {
-      const response = await authApi.logout()
-      if (response) {
-        resetToken()
-        return true
-      }
-      return false
+      await authApi.logout()
+      resetToken()
+      return true
     } catch (error) {
       console.error('Logout error:', error)
       return false

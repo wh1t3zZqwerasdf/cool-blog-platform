@@ -1,7 +1,10 @@
 import axios, { type AxiosRequestConfig } from 'axios'
 import { useMessage } from '@/hooks'
 import { useUserStoreHook } from '@/stores/user'
+import { useRouter } from 'vue-router'
+
 const message = useMessage()
+const router = useRouter()
 
 // 创建 axios 实例
 const service = axios.create({
@@ -13,9 +16,12 @@ const service = axios.create({
 service.interceptors.request.use(
   (config) => {
     const userStore = useUserStoreHook()
-    if (userStore.token) {
-      config.headers = config.headers ?? {}
-      config.headers.Authorization = `Bearer ${userStore.token}`
+    const token = userStore.token
+    if (token) {
+      // 确保 config.headers 存在
+      config.headers = config.headers || {}
+      // 设置 Authorization header
+      config.headers['Authorization'] = `Bearer ${token}`
     }
     return config
   },
@@ -28,28 +34,28 @@ service.interceptors.request.use(
 // 响应拦截器
 service.interceptors.response.use(
   (response) => {
-    const { code, message, data } = response.data
+    const { code, message: msg, data } = response.data
     if (code === 200) {
-      return data
+      return response.data
     }
 
     if (code === 401) {
       const userStore = useUserStoreHook()
       userStore.resetToken()
-      window.location.href = '/login'
+      router.push('/login')
       message.error('登录已过期，请重新登录')
     }
 
-    message.error(message || '请求失败')
-    return Promise.reject(new Error(message || 'Error'))
+    message.error(msg || '请求失败')
+    return Promise.reject(new Error(msg || 'Error'))
   },
   (error) => {
-    message.error(error.response?.data?.msg || '网络错误')
+    message.error(error.response?.data?.message || '网络错误')
     return Promise.reject(error)
   }
 )
 
-// 请求方法
-export default function request<T = any>(config: AxiosRequestConfig) {
-  return service.request<any, T>(config)
+// 导出请求方法
+export default function request<T = any>(config: AxiosRequestConfig): Promise<T> {
+  return service.request(config)
 }
