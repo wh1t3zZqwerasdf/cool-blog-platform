@@ -50,7 +50,7 @@ async function handleLogin() {
     const success = await userStore.login(formData)
     if (success) {
       message.success('登录成功')
-      router.push('/dashboard')
+      router.push('/workspace')
     } else {
       formState.errors.general = '登录失败，请检查邮箱和密码'
       message.error('登录失败，请检查您的邮箱和密码是否正确')

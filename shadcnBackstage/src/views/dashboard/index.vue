@@ -73,11 +73,11 @@ import {
   SquareTerminal,
   Trash2,
 } from 'lucide-vue-next'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStoreHook } from '@/stores/user'
 import { useMessage } from '@/hooks/useMessage'
-import ChartCard from './components/ChartCard.vue'
+
 
 // 这是示例数据
 const data = {
@@ -103,89 +103,61 @@ const data = {
       plan: '免费版',
     },
   ],
-  navMain: [
+  navMain:[
     {
       title: '工作台',
-      url: '#',
+      url: '/workspace',
       icon: SquareTerminal,
       isActive: true,
       items: [
         {
-          title: '历史记录',
-          url: '#',
-        },
-        {
-          title: '收藏夹',
-          url: '#',
-        },
-        {
-          title: '设置',
-          url: '#',
+          title: '统计数据',
+          url: '/workspace/statistics',
         },
       ],
     },
     {
       title: '内容管理',
-      url: '#',
+      url: '/content',
       icon: Bot,
       items: [
         {
           title: '文章管理',
-          url: '#',
-        },
-        {
-          title: '分类管理',
-          url: '#',
-        },
-        {
-          title: '标签管理',
-          url: '#',
-        },
-      ],
-    },
-    {
-      title: '系统文档',
-      url: '#',
-      icon: BookOpen,
-      items: [
-        {
-          title: '介绍',
-          url: '#',
-        },
-        {
-          title: '快速开始',
-          url: '#',
-        },
-        {
-          title: '使用教程',
-          url: '#',
-        },
-        {
-          title: '更新日志',
-          url: '#',
+          url: '/content/articles',
         },
       ],
     },
     {
       title: '系统设置',
-      url: '#',
+      url: '/settings',
       icon: Settings2,
       items: [
         {
           title: '基本设置',
-          url: '#',
+          url: '/settings/basic',
         },
         {
-          title: '团队管理',
-          url: '#',
+          title: '用户管理',
+          url: '/settings/users',
         },
         {
-          title: '账单中心',
-          url: '#',
+          title: '概览',
+          url: '/settings/overview',
+        },
+      ],
+    },
+    {
+      title: '系统文档',
+      url: '/docs',
+      icon: BookOpen,
+      items: [
+        {
+          title: '介绍',
+          url: '/docs/introduction',
         },
         {
-          title: '权限设置',
-          url: '#',
+          title: '更新日志',
+          url: '/docs/changelog',
         },
       ],
     },
@@ -213,6 +185,16 @@ const activeTeam = ref(data.teams[0])
 const router = useRouter()
 const userStore = useUserStoreHook()
 const message = useMessage()
+
+// 根据路由生成面包屑数据
+const breadcrumbs = computed(() => {
+  const route = router.currentRoute.value
+  const matched = route.matched
+  return matched.map(record => ({
+    name: record.meta.title as string || record.name,
+    path: record.path
+  })).filter(item => item.name)
+})
 
 async function handleLogout() {
   try {
@@ -313,9 +295,9 @@ function setActiveTeam(team: typeof data.teams[number]) {
                       :key="subItem.title"
                     >
                       <SidebarMenuSubButton as-child>
-                        <a :href="subItem.url">
+                        <RouterLink :to="subItem.url">
                           <span>{{ subItem.title }}</span>
-                        </a>
+                        </RouterLink>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                   </SidebarMenuSub>
@@ -448,41 +430,31 @@ function setActiveTeam(team: typeof data.teams[number]) {
           <Separator orientation="vertical" class="mr-2 h-4" />
           <Breadcrumb>
             <BreadcrumbList>
-              <BreadcrumbItem class="hidden md:block">
-                <BreadcrumbLink href="#">
-                  构建您的应用程序
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator class="hidden md:block" />
-              <BreadcrumbItem>
-                <BreadcrumbPage>数据获取</BreadcrumbPage>
-              </BreadcrumbItem>
+              <template v-for="(item, index) in breadcrumbs" :key="item.path">
+                <BreadcrumbItem class="hidden md:block">
+                  <template v-if="index === breadcrumbs.length - 1">
+                    <BreadcrumbPage>{{ item.name }}</BreadcrumbPage>
+                  </template>
+                  <template v-else>
+                    <BreadcrumbLink as-child>
+                      <RouterLink :to="item.path" class="hover:text-primary">
+                        {{ item.name }}
+                      </RouterLink>
+                    </BreadcrumbLink>
+                  </template>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator 
+                  v-if="index < breadcrumbs.length - 1" 
+                  class="hidden md:block" 
+                />
+              </template>
             </BreadcrumbList>
           </Breadcrumb>
         </div>
       </header>
-      <div class="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <!-- 顶部部分 -->
-        <div class="flex-1 bg-muted/50 rounded-xl max-h-[100px] flex items-center justify-center">
-          <p class="text-muted-foreground">顶部部分</p>
-        </div>
-        <!-- 上半部分：卡片网格 -->
-        <div class="grid auto-rows-min gap-4 md:grid-cols-4">
-          <div class="aspect-video rounded-xl bg-muted/50" />
-          <div class="aspect-video rounded-xl bg-muted/50" />
-          <div class="aspect-video rounded-xl bg-muted/50" />
-          <div class="aspect-video rounded-xl bg-muted/50" />
-        </div>
-        <!-- 下半部分：分成左右两栏 -->
-        <div class="flex flex-col md:flex-row  gap-4 md:min-h-min">
-          <div class="flex-1 bg-muted/50 rounded-xl">
-            <ChartCard class="h-[500px] px-0 py-4" />
-          </div>
-          <div class="flex-1 bg-muted/50 rounded-xl">
-            <!-- Right side is empty -->
-          </div>
-        </div>
-      </div>
+      <main class="flex-1">
+        <RouterView />
+      </main>
     </SidebarInset>
   </SidebarProvider>
 </template>
