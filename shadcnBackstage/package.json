@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tanstack/vue-table": "^8.20.5",
     "@unovis/ts": "^1.4.5",
     "@unovis/vue": "^1.4.5",
     "@vueuse/core": "^12.0.0",
