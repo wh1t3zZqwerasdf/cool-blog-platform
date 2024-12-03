@@ -49,8 +49,8 @@ app.get('/', (req, res) => {
 // API路由注册
 console.log('注册路由...');
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);  // 添加用户路由
 app.use('/api/articles', articleRoutes);
-app.use('/api/users', userRoutes);
 console.log('路由注册完成');
 
 // 404处理

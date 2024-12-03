@@ -6,7 +6,7 @@ const Response = require('../utils/response');
 // 注册
 exports.register = async (req, res) => {
     try {
-        const { username, email, password } = req.body;
+        const { username, email, password, role } = req.body;
 
         // 检查用户名是否已存在
         const existingUsername = await User.findOne({ username });
@@ -20,12 +20,15 @@ exports.register = async (req, res) => {
             return res.json(Response.error('邮箱已被注册'));
         }
 
+        // 验证角色
+        const validRole = role === 'Admin' ? 'Admin' : 'Guest';
+
         // 创建新用户
         const user = new User({
             username,
             email,
             password,
-            role: 'admin' // 默认设置为admin角色
+            role: validRole // 如果没有指定角色或角色无效，默认设置为Guest
         });
 
         await user.save();

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getUserList } = require('../controllers/user');
+const { getUserList, getUsersByRole } = require('../controllers/user');
 const { authenticateToken, isAdmin } = require('../middleware/auth');
 
 /**
@@ -21,7 +21,7 @@ const { authenticateToken, isAdmin } = require('../middleware/auth');
  *           description: 邮箱
  *         role:
  *           type: string
- *           enum: [admin, editor]
+ *           enum: [Admin, Guest]
  *           description: 用户角色
  *         createdAt:
  *           type: string
@@ -106,6 +106,9 @@ router.get('/test', (req, res) => {
  */
 
 // 获取用户列表
-router.get('/', authenticateToken, isAdmin, getUserList);
+router.get('/', authenticateToken, getUserList);
+
+// 根据角色查询用户
+router.post('/by-role', authenticateToken, getUsersByRole);
 
 module.exports = router;

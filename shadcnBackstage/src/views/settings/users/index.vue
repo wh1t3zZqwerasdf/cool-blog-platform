@@ -17,7 +17,7 @@
                 <Button variant="outline" size="sm" class="h-7 gap-1">
                   <ListFilter class="h-3.5 w-3.5" />
                   <span class="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                    过滤
+                    角色
                   </span>
                 </Button>
               </DropdownMenuTrigger>
