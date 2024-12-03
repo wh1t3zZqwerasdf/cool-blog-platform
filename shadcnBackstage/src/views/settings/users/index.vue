@@ -17,19 +17,19 @@
                 <Button variant="outline" size="sm" class="h-7 gap-1">
                   <ListFilter class="h-3.5 w-3.5" />
                   <span class="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                    角色
+                    {{ selectedRole ? roleFilter.find(r => r.value === selectedRole)?.label : '全部' }}
                   </span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Filter by</DropdownMenuLabel>
+                <DropdownMenuLabel>角色选择</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem checked>
-                  Active
-                </DropdownMenuItem>
-                <DropdownMenuItem>Draft</DropdownMenuItem>
-                <DropdownMenuItem>
-                  Archived
+                <DropdownMenuItem 
+                  v-for="item in roleFilter" 
+                  :key="item.value"
+                  @click="handleRoleSelect(item.value)"
+                >
+                  {{ item.label }}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -72,7 +72,7 @@
                       </TableCell>
                       <TableCell class="font-medium">{{ item.username }}</TableCell>
                       <TableCell>
-                        <Badge variant="outline">{{ item.role }}</Badge>
+                        <Badge variant="outline">{{  roleFilter.find(r => r.value === item.role)?.label || item.role }}</Badge>
                       </TableCell>
                       <TableCell class="hidden md:table-cell">{{ item.email }}</TableCell>
                       <TableCell class="hidden md:table-cell">{{ item.createdAt }}</TableCell>
@@ -83,7 +83,7 @@
                               <MoreHorizontal class="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
+                          <DropdownMenuContent align="center">
                             <DropdownMenuItem>编辑</DropdownMenuItem>
                             <DropdownMenuItem>删除</DropdownMenuItem>
                           </DropdownMenuContent>
@@ -233,7 +233,7 @@ import {
   FormMessage
 } from '@/components/ui/form'
 
-import { ref, onMounted, reactive, watch } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useMessage } from '@/hooks'
 import { userApi, type User } from '@/api/user'
 import { useForm } from 'vee-validate'
@@ -242,12 +242,38 @@ import * as z from 'zod'
 
 const message = useMessage()
 const usersData = ref<User[]>([])
-const PageData = reactive({
-  total: 0,
+const PageData = ref({
   page: 1,
-  pageSize: 6
+  pageSize: 6,
+  total: 0
 })
 const showAddDialog = ref(false)
+
+const roleFilter = ref([
+  {
+    value: '',
+    label: '全部'
+  },
+  {
+    value: 'admin',
+    label: '管理员'
+  },
+  {
+    value: 'guest',
+    label: '访客'
+  }
+])
+
+const selectedRole = ref('')
+
+const handleRoleSelect = async (role:string) => {
+  selectedRole.value = role
+  // 重置页码
+  PageData.value.page = 1
+  // 重新获取用户列表
+  console.log(role)
+  await fetchUsers()
+}
 
 // 表单验证规则
 const formSchema = toTypedSchema(z.object({
@@ -292,26 +318,23 @@ const onSubmit = form.handleSubmit(async (values) => {
 const fetchUsers = async () => {
   try {
     const params = {
-      page: PageData.page,
-      pageSize: PageData.pageSize
+      page: PageData.value.page,
+      pageSize: PageData.value.pageSize,
+      ...(selectedRole.value ? { role: selectedRole.value } : {})
     }
-    console.log('请求参数:', params)
     const { data, success } = await userApi.getUsers(params)
-    console.log('API响应:', { data, success })
     if (success) {
       usersData.value = data.list
-      PageData.total = data.total
-      console.log('更新后的PageData:', { ...PageData })
+      PageData.value.total = data.total
     }
   } catch (error) {
     console.error('获取用户列表失败:', error)
-    message.error('获取用户列表失败')
   }
 }
 
 // 监听分页数据变化
 watch(
-  () => PageData.page,
+  () => PageData.value.page,
   (newPage) => {
     if (newPage) {
       fetchUsers()
@@ -321,6 +344,7 @@ watch(
 )
 
 onMounted(() => {
+  fetchUsers()
   console.log('组件挂载，初始化获取数据')
 })
 </script>
