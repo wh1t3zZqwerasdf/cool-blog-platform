@@ -33,7 +33,7 @@
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button size="sm" class="h-7 gap-1">
+            <Button size="sm" class="h-7 gap-1" @click="showAddDialog = true">
               <PlusCircle class="h-3.5 w-3.5" />
               <span class="sr-only sm:not-sr-only sm:whitespace-nowrap">
                 添加人员
@@ -80,7 +80,7 @@
                       <TableCell class="hidden md:table-cell">{{ item.createdAt }}</TableCell>
                       <TableCell>
                         <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
+                          <DropdownMenuTrigger as-child>
                             <Button aria-haspopup="true" size="icon" variant="ghost">
                               <MoreHorizontal class="h-4 w-4" />
                             </Button>
@@ -96,19 +96,30 @@
                 </Table>
               </CardContent>
               <CardFooter>
-                <div class="text-xs text-muted-foreground">
-                  <Pagination v-slot="{ page }" :total="PageData.total" :sibling-count="1" show-edges :default-page="1">
-                    <PaginationList v-slot="{ items }" class="flex items-center gap-1">
+                <div class="w-full flex justify-end">
+                  <Pagination 
+                    v-model:page="PageData.page"
+                    :total="PageData.total" 
+                    :page-size="PageData.pageSize"
+                    :sibling-count="1" 
+                    show-edges
+                  >
+                    <PaginationList class="flex items-center gap-1">
                       <PaginationFirst />
                       <PaginationPrev />
-                      <template v-for="(item, index) in items">
-                        <PaginationListItem v-if="item.type === 'page'" :key="index" :value="item.value" as-child>
-                          <Button class="w-10 h-10 p-0" :variant="item.value === page ? 'default' : 'outline'">
-                            {{ item.value }}
-                          </Button>
-                        </PaginationListItem>
-                        <PaginationEllipsis v-else :key="item.type" :index="index" />
-                      </template>
+                      <PaginationListItem 
+                        v-for="page in Math.ceil(PageData.total / PageData.pageSize)" 
+                        :key="page" 
+                        :value="page" 
+                        as-child
+                      >
+                        <Button 
+                          class="w-10 h-10 p-0" 
+                          :variant="page === PageData.page ? 'default' : 'outline'"
+                        >
+                          {{ page }}
+                        </Button>
+                      </PaginationListItem>
                       <PaginationNext />
                       <PaginationLast />
                     </PaginationList>
@@ -121,6 +132,55 @@
       </main>
     </div>
   </div>
+
+  <!-- 添加用户弹窗 -->
+  <Dialog :open="showAddDialog" @update:open="showAddDialog = false">
+    <DialogContent class="sm:max-w-[425px]">
+      <DialogHeader>
+        <DialogTitle>添加用户</DialogTitle>
+        <DialogDescription>
+          请填写新用户的信息。所有字段都是必填的。
+        </DialogDescription>
+      </DialogHeader>
+      <form @submit="onSubmit">
+        <div class="grid gap-4 py-4">
+          <FormField v-slot="{ componentField }" name="username">
+            <FormItem>
+              <FormLabel>用户名</FormLabel>
+              <FormControl>
+                <Input type="text" placeholder="请输入用户名" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="email">
+            <FormItem>
+              <FormLabel>邮箱</FormLabel>
+              <FormControl>
+                <Input type="email" placeholder="请输入邮箱" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="password">
+            <FormItem>
+              <FormLabel>密码</FormLabel>
+              <FormControl>
+                <Input type="password" placeholder="请输入密码" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+        </div>
+        <DialogFooter>
+          <Button type="button" variant="outline" @click="showAddDialog = false">取消</Button>
+          <Button type="submit">确定</Button>
+        </DialogFooter>
+      </form>
+    </DialogContent>
+  </Dialog>
 </template>
 
 <script setup lang="ts">
@@ -166,17 +226,70 @@ import {
   Users2,
 } from 'lucide-vue-next'
 
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from '@/components/ui/dialog'
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from '@/components/ui/form'
 
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, reactive, watch } from 'vue'
 import { useMessage } from '@/hooks'
 import { userApi, type User } from '@/api/user'
+import { useForm } from 'vee-validate'
+import { toTypedSchema } from '@vee-validate/zod'
+import * as z from 'zod'
 
 const message = useMessage()
 const usersData = ref<User[]>([])
 const PageData = reactive({
-  total:0,
-  page:1,
-  pageSize:6
+  total: 0,
+  page: 1,
+  pageSize: 6
+})
+const showAddDialog = ref(false)
+
+// 表单验证规则
+const formSchema = toTypedSchema(z.object({
+  username: z.string()
+    .min(2, '用户名至少需要3个字符')
+    .max(50, '用户名最多50个字符'),
+  email: z.string()
+    .email('请输入有效的邮箱地址'),
+  password: z.string()
+    .min(6, '密码至少需要6个字符')
+}))
+
+// 初始值
+const initialValues = {
+  username: '',
+  email: '',
+  password: 'admin123'
+}
+
+// 使用 useForm
+const form = useForm({
+  validationSchema: formSchema,
+  initialValues
+})
+
+// 提交表单
+const onSubmit = form.handleSubmit(async (values) => {
+  try {
+    const { data, success } = await userApi.register(values)
+    if (success) {
+      message.success('用户创建成功')
+      showAddDialog.value = false
+      // 刷新用户列表
+      fetchUsers()
+    }
+  } catch (error) {
+    message.error('创建用户失败')
+  }
 })
 
 // 获取用户列表
@@ -186,20 +299,32 @@ const fetchUsers = async () => {
       page: PageData.page,
       pageSize: PageData.pageSize
     }
+    console.log('请求参数:', params)
     const { data, success } = await userApi.getUsers(params)
+    console.log('API响应:', { data, success })
     if (success) {
       usersData.value = data.list
       PageData.total = data.total
-      console.log('获取用户列表成功:', data)
+      console.log('更新后的PageData:', { ...PageData })
     }
   } catch (error) {
-    console.error('获取用户列表错误:', error)
+    console.error('获取用户列表失败:', error)
     message.error('获取用户列表失败')
   }
 }
 
+// 监听分页数据变化
+watch(
+  () => PageData.page,
+  (newPage) => {
+    if (newPage) {
+      fetchUsers()
+    }
+  },
+  { immediate: true }
+)
 
 onMounted(() => {
-  fetchUsers()
+  console.log('组件挂载，初始化获取数据')
 })
 </script>

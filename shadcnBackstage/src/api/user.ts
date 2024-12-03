@@ -15,13 +15,29 @@ export interface UserListResponse {
   total: number
 }
 
+// 注册用户请求参数接口
+export interface RegisterUserParams {
+  username: string
+  email: string
+  password: string
+}
+
 export const userApi = {
   // 获取用户列表
   getUsers(params: { page: number; pageSize: number }) {
     return request<ApiResponse<UserListResponse>>({
       url: '/api/users',
-      method: 'get',
+      method: 'GET',
       params
+    })
+  },
+
+  // 注册用户
+  register(data: RegisterUserParams) {
+    return request<ApiResponse<User>>({
+      url: '/api/auth/register',
+      method: 'POST',
+      data
     })
   },
 
@@ -29,7 +45,7 @@ export const userApi = {
   deleteUser(id: string) {
     return request<ApiResponse<null>>({
       url: `/api/users/${id}`,
-      method: 'delete'
+      method: 'DELETE'
     })
   },
 
@@ -37,7 +53,7 @@ export const userApi = {
   updateUser(id: string, data: Partial<User>) {
     return request<ApiResponse<User>>({
       url: `/api/users/${id}`,
-      method: 'put',
+      method: 'PUT',
       data
     })
   }
