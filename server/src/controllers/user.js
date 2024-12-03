@@ -17,12 +17,21 @@ async function getUserList(req, res) {
     console.log('分页参数:', { page, pageSize, skip });
     
     // 查询用户列表，排除密码字段
-    const list = await User.find({}, { password: 0 })
+    const list = await User.find({})
+      .select('username email role createdAt')  // 只选择需要的字段
       .skip(skip)
       .limit(Number(pageSize))
-      .sort({ createdAt: -1 }); // 按创建时间倒序
+      .sort({ createdAt: -1 })  // 按创建时间倒序
+      .lean();  // 转换为普通 JavaScript 对象
     
-    console.log('查询到的用户列表:', list);
+    // 处理返回的数据
+    const formattedList = list.map(user => ({
+      id: user._id.toString(),  // 将 ObjectId 转换为字符串
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      createdAt: user.createdAt
+    }));
     
     // 获取总数
     const total = await User.countDocuments();
@@ -30,7 +39,7 @@ async function getUserList(req, res) {
     
     // 返回结果
     res.json(Response.success({
-      list,
+      list: formattedList,
       total
     }));
   } catch (error) {
