@@ -51,55 +51,37 @@ export interface PaginatedResponse<T> {
 
 export const userApi = {
   // 获取用户列表
-  getUsers(params: { page: number; pageSize: number }) {
-    return request<ApiResponse<UserListResponse>>({
-      url: '/api/users',
-      method: 'GET',
-      params
-    })
+  getUsers(params: { page: number; pageSize: number; role?: string }) {
+    return request({
+      url: '/api/users/list',
+      method: 'post',
+      data: params
+    }) as Promise<ApiResponse<UserListResponse>>
   },
 
   // 注册用户
   register(data: RegisterUserParams) {
-    return request<ApiResponse<User>>({
+    return request({
       url: '/api/auth/register',
-      method: 'POST',
+      method: 'post',
       data
     })
   },
 
   // 删除用户
   deleteUser(id: string) {
-    return request<ApiResponse<null>>({
+    return request({
       url: `/api/users/${id}`,
-      method: 'DELETE'
+      method: 'delete'
     })
   },
 
   // 更新用户
   updateUser(id: string, data: Partial<User>) {
-    return request<ApiResponse<User>>({
+    return request({
       url: `/api/users/${id}`,
-      method: 'PUT',
+      method: 'put',
       data
     })
   },
-
-  // 获取用户列表
-  getUserList(params: UserQueryParams) {
-    return request<PaginatedResponse<UserInfo>>({
-      url: '/users',
-      method: 'get',
-      params
-    })
-  },
-
-  // 根据角色查询用户
-  getUsersByRole(data: { role: UserRole; page?: number; pageSize?: number }) {
-    return request<PaginatedResponse<UserInfo>>({
-      url: '/users/by-role',
-      method: 'post',
-      data
-    })
-  }
 }

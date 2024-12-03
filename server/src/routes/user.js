@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { getUserList, getUsersByRole } = require('../controllers/user');
-const { authenticateToken, isAdmin } = require('../middleware/auth');
+const { getUserList } = require('../controllers/user');
+const { authenticateToken } = require('../middleware/auth');
 
 /**
  * @swagger
@@ -31,55 +31,40 @@ const { authenticateToken, isAdmin } = require('../middleware/auth');
 
 /**
  * @swagger
- * /api/users/test:
- *   get:
- *     summary: 测试用户路由
- *     tags: [Users]
- *     responses:
- *       200:
- *         description: 成功
- */
-// 测试路由 - 不需要认证
-router.get('/test', (req, res) => {
-    res.json({ message: '用户路由测试成功' });
-});
-
-/**
- * @swagger
  * /api/users:
- *   get:
+ *   post:
  *     summary: 获取用户列表
- *     description: 获取系统中的用户列表，支持分页
+ *     description: 获取系统中的用户列表，支持分页和角色筛选
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           default: 1
- *         description: 当前页码
- *       - in: query
- *         name: pageSize
- *         schema:
- *           type: integer
- *           default: 10
- *         description: 每页条数
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               page:
+ *                 type: number
+ *                 description: 页码
+ *               pageSize:
+ *                 type: number
+ *                 description: 每页数量
+ *               role:
+ *                 type: string
+ *                 enum: [admin, guest]
+ *                 description: 用户角色（可选）
  *     responses:
  *       200:
- *         description: 成功获取用户列表
+ *         description: 成功返回用户列表
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 code:
- *                   type: integer
- *                   example: 0
- *                 msg:
- *                   type: string
- *                   example: success
+ *                 success:
+ *                   type: boolean
  *                 data:
  *                   type: object
  *                   properties:
@@ -87,28 +72,15 @@ router.get('/test', (req, res) => {
  *                       type: array
  *                       items:
  *                         $ref: '#/components/schemas/User'
- *                     pagination:
- *                       type: object
- *                       properties:
- *                         total:
- *                           type: integer
- *                           description: 总记录数
- *                         page:
- *                           type: integer
- *                           description: 当前页码
- *                         pageSize:
- *                           type: integer
- *                           description: 每页条数
- *       401:
- *         description: 未授权访问
- *       500:
- *         description: 服务器错误
+ *                     total:
+ *                       type: number
+ *                     page:
+ *                       type: number
+ *                     pageSize:
+ *                       type: number
  */
 
 // 获取用户列表
-router.get('/', authenticateToken, getUserList);
-
-// 根据角色查询用户
-router.post('/by-role', authenticateToken, getUsersByRole);
+router.post('/list', authenticateToken, getUserList);
 
 module.exports = router;
