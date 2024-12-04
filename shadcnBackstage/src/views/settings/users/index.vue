@@ -152,7 +152,7 @@
             <FormItem>
               <FormLabel>用户名</FormLabel>
               <FormControl>
-                <Input type="text" placeholder="请输入用户名" v-bind="componentField" />
+                <Input type="text" clearable placeholder="请输入用户名" v-bind="componentField" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -162,7 +162,7 @@
             <FormItem>
               <FormLabel>邮箱</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="请输入邮箱" v-bind="componentField" />
+                <Input type="email" clearable placeholder="请输入邮箱" v-bind="componentField" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -172,7 +172,7 @@
             <FormItem>
               <FormLabel>密码</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="请输入密码" v-bind="componentField" />
+                <Input type="password" clearable placeholder="请输入密码" v-bind="componentField" />
               </FormControl>
               <FormMessage />
             </FormItem>
